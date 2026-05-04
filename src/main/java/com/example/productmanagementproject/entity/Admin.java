@@ -15,4 +15,10 @@ public class Admin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
+    public Admin(String name) {
+        this.name = name;
+    }
+
 }

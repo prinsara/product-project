@@ -33,9 +33,9 @@ public class Product {
     @JoinColumn(name = "admin_id")
     private Admin admin;
 
-    public Product(Admin admin, Long price, String name) {
-        this.admin = admin;
-        this.price = price;
+    public Product(String name, Long price, Admin admin) {
         this.name = name;
+        this.price = price;
+        this.admin = admin;
     }
 }
