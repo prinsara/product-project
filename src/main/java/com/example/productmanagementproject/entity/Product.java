@@ -38,4 +38,10 @@ public class Product {
         this.price = price;
         this.admin = admin;
     }
+
+    public void update(String name, Long price, Admin admin) {
+        this.name = name;
+        this.price = price;
+        this.admin = admin;
+    }
 }
