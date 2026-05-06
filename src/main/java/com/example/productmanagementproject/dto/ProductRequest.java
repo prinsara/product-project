@@ -3,7 +3,7 @@ package com.example.productmanagementproject.dto;
 import lombok.Getter;
 
 @Getter
-public class GetProductRequest {
+public class ProductRequest {
 
     private String name;
     private Long price;

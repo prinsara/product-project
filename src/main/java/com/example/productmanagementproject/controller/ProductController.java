@@ -1,7 +1,7 @@
 package com.example.productmanagementproject.controller;
 
-import com.example.productmanagementproject.dto.GetProductRequest;
-import com.example.productmanagementproject.dto.GetProductResponse;
+import com.example.productmanagementproject.dto.ProductRequest;
+import com.example.productmanagementproject.dto.ProductResponse;
 import com.example.productmanagementproject.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,27 +19,27 @@ public class ProductController {
 
     //상품 생성
     @PostMapping
-    public ResponseEntity<GetProductResponse> createProduct(@RequestBody GetProductRequest request) {
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request));
     }
 
     //상품 전체 조회
     @GetMapping
-    public ResponseEntity<List<GetProductResponse>> getProducts() {
+    public ResponseEntity<List<ProductResponse>> getProducts() {
         return ResponseEntity.ok(productService.getProducts());
     }
 
     //상품 단건 조회
     @GetMapping("/{id}")
-    public ResponseEntity<GetProductResponse> getProduct(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProduct(id));
     }
 
     //상품 수정
     @PutMapping("/{id}")
-    public ResponseEntity<GetProductResponse> updateProduct(
+    public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long id,
-            @RequestBody GetProductRequest request
+            @RequestBody ProductRequest request
     ) {
         return ResponseEntity.ok(productService.updateProduct(id, request));
     }
