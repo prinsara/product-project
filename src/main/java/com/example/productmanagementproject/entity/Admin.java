@@ -17,8 +17,16 @@ public class Admin {
 
     private String name;
 
-    public Admin(String name) {
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    public Admin(String name, String email, String password) {
         this.name = name;
+        this.email = email;
+        this.password = password;
     }
 
 }
