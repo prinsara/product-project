@@ -3,6 +3,7 @@ package com.example.productmanagementproject.controller;
 import com.example.productmanagementproject.dto.ProductRequest;
 import com.example.productmanagementproject.dto.ProductResponse;
 import com.example.productmanagementproject.service.ProductService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +16,15 @@ import java.util.List;
 @RequiredArgsConstructor //final 붙은 필드 생성자 자동으로 만들고 의존성 주입 쉽게 하게 해주는 것
 public class ProductController {
 
+    private static final String LOGIN_ADMIN_ID = "LOGIN_ADMIN_ID";
+
     private final ProductService productService;
 
     //상품 생성
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request));
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request, HttpSession session) {
+        Long loginAdminId = productService.getLoginAdminId((Long) session.getAttribute(LOGIN_ADMIN_ID));
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(request, loginAdminId));
     }
 
     //상품 전체 조회
@@ -39,15 +43,18 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long id,
-            @RequestBody ProductRequest request
+            @RequestBody ProductRequest request,
+            HttpSession session
     ) {
-        return ResponseEntity.ok(productService.updateProduct(id, request));
+        Long loginAdminId = productService.getLoginAdminId((Long) session.getAttribute(LOGIN_ADMIN_ID));
+        return ResponseEntity.ok(productService.updateProduct(id, request, loginAdminId));
     }
 
     //상품 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id, HttpSession session) {
+        Long loginAdminId = productService.getLoginAdminId((Long) session.getAttribute(LOGIN_ADMIN_ID));
+        productService.deleteProduct(id, loginAdminId);
         return ResponseEntity.noContent().build();
     }
 }

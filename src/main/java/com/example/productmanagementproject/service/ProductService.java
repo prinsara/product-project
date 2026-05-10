@@ -9,8 +9,12 @@ import com.example.productmanagementproject.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Service
 @RequiredArgsConstructor
@@ -20,11 +24,11 @@ public class ProductService {
     private final AdminRepository adminRepository;
 
     @Transactional
-    public ProductResponse createProduct(ProductRequest request) {
+    public ProductResponse createProduct(ProductRequest request, Long loginAdminId) {
 
         // 1. adminId로 관리자 조회
         //상품 여러 개 : 관리자 1명
-        Admin admin = findAdminById(request.getAdminId());
+        Admin admin = findAdminById(loginAdminId);
 
         // 2. 요청 DTO를 Entity로 변환
         Product product = new Product(
@@ -78,19 +82,19 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductResponse updateProduct(Long productId, ProductRequest request) {
+    public ProductResponse updateProduct(Long productId, ProductRequest request, Long loginAdminId) {
 
         // 1. 수정할 상품 조회
         Product product = findProductById(productId);
 
-        // 2. adminId로 관리자 조회
-        Admin admin = findAdminById(request.getAdminId());
+        // 2. 로그인한 관리자가 본인 상품인지 확인
+        validateOwner(product, loginAdminId);
 
         // 3. 상품 정보 수정
         product.update(
                 request.getName(),
                 request.getPrice(),
-                admin
+                product.getAdmin()
         );
 
         // 4. 수정된 상품을 응답 DTO로 변환 후 반환
@@ -103,12 +107,15 @@ public class ProductService {
     }
 
     @Transactional
-    public void deleteProduct(Long productId) {
+    public void deleteProduct(Long productId, Long loginAdminId) {
 
         // 1. 삭제할 상품 조회
         Product product = findProductById(productId);
 
-        // 2. 상품 삭제
+        // 2. 로그인한 관리자가 본인 상품인지 확인
+        validateOwner(product, loginAdminId);
+
+        // 3. 상품 삭제
         productRepository.delete(product);
     }
 
@@ -120,5 +127,18 @@ public class ProductService {
     private Admin findAdminById(Long adminId) {
         return adminRepository.findById(adminId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
+    }
+
+    public Long getLoginAdminId(Long loginAdminId) {
+        if (loginAdminId == null) {
+            throw new ResponseStatusException(UNAUTHORIZED, "로그인이 필요합니다.");
+        }
+        return loginAdminId;
+    }
+
+    private void validateOwner(Product product, Long loginAdminId) {
+        if (!product.getAdmin().getId().equals(loginAdminId)) {
+            throw new ResponseStatusException(FORBIDDEN, "본인 상품만 수정 또는 삭제할 수 있습니다.");
+        }
     }
 }
