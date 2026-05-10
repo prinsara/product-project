@@ -119,16 +119,19 @@ public class ProductService {
         productRepository.delete(product);
     }
 
+    // 상품 id로 조회하고, 없으면 예외를 던짐
     private Product findProductById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
     }
 
+    // 관리자 id로 조회하고, 없으면 예외를 던짐
     private Admin findAdminById(Long adminId) {
         return adminRepository.findById(adminId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다."));
     }
 
+    // 세션에 저장된 로그인 관리자 id가 없으면 인증 실패로 처리
     public Long getLoginAdminId(Long loginAdminId) {
         if (loginAdminId == null) {
             throw new ResponseStatusException(UNAUTHORIZED, "로그인이 필요합니다.");
@@ -136,6 +139,7 @@ public class ProductService {
         return loginAdminId;
     }
 
+    // 로그인한 관리자가 이 상품의 주인인지 확인
     private void validateOwner(Product product, Long loginAdminId) {
         if (!product.getAdmin().getId().equals(loginAdminId)) {
             throw new ResponseStatusException(FORBIDDEN, "본인 상품만 수정 또는 삭제할 수 있습니다.");
